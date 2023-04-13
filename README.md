@@ -1,24 +1,44 @@
 # PgPoolSafeQuery
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pg_pool_safe_query`. To experiment with that code, run `bin/console` for an interactive prompt.
+- Log warnings for queries that are incompatible with PgBouncer
+- Raise an error for `database.yml` settings that are incompatible with PgBouncer
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ bundle add pg_pool_safe_query
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_PRIOR_TO_RELEASE_TO_RUBYGEMS_ORG
+    $ gem install pg_pool_safe_query
 
 ## Usage
 
-TODO: Write usage instructions here
+Queries should automatically warn if the syntax is not compatible with PgBouncer. For instance, on Rails server startup you should see:
+
+```
+WARN -- : The query is incompatible with PgBouncer's transaction mode. SET client_min_messages TO 'warning'
+WARN -- : The query is incompatible with PgBouncer's transaction mode. SET standard_conforming_strings = on
+WARN -- : The query is incompatible with PgBouncer's transaction mode. SET intervalstyle = iso_8601
+WARN -- : The query is incompatible with PgBouncer's transaction mode. SET SESSION timezone TO 'UTC'
+```
+
+In your `database.yml`, you can turn on configuration checks with the `pgbouncer_transaction_mode_check` flag:
+
+```
+production:
+  pgbouncer_transaction_mode_check: true
+```
+
+When this is enabled, if you do not have `prepared_statements` and `advisory_locks` set to false, it will raise an error. Fix it by setting those options:
+
+```
+production:
+  pgbouncer_transaction_mode_check: true
+  advisory_locks: true
+  prepared_statements: false
+```
 
 ## Development
 
@@ -28,7 +48,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/pg_pool_safe_query. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/pg_pool_safe_query/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/jpcamara/pg-pool-safe-query. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/jpcamara/pg-pool-safe-query/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -36,4 +56,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the PgPoolSafeQuery project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/pg_pool_safe_query/blob/main/CODE_OF_CONDUCT.md).
+Everyone interacting in the PgPoolSafeQuery project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/jpcamara/pg-pool-safe-query/blob/main/CODE_OF_CONDUCT.md).
